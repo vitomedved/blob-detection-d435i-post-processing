@@ -4,14 +4,8 @@ CURRENT_DIR=$PWD
 OPENCV_DIR=$CURRENT_DIR"/../../third-party/opencv"
 OPENCV_SRC_DIR=$OPENCV_DIR"/opencv-4.1.1"
 OPENCV_BUILD_DIR=$OPENCV_SRC_DIR"/build"
-OPENCV_INSTALL_DIR=$OPENCV_DIR
+OPENCV_INSTALL_DIR=$OPENCV_DIR"/build_linux"
 
-#if [ ! -d $OPENCV_DIR ]; then
-#    mkdir $OPENCV_DIR
-#else
-#    rm -rf $OPENCV_DIR"/*";
-#fi
-####################################
 cd $OPENCV_DIR
 
 if [ -d $OPENCV_SRC_DIR ]; then
@@ -29,6 +23,12 @@ else
 fi
 
 cd $OPENCV_BUILD_DIR
+
+if [ ! -d $OPENCV_INSTALL_DIR ]; then
+    mkdir $OPENCV_INSTALL_DIR
+else
+    rm -rf $OPENCV_INSTALL_DIR"/*";
+fi
 
 cmake -DBUILD_LIST=core,imgcodecs,improc,videoio,highgui,video -DCMAKE_INSTALL_PREFIX=$OPENCV_INSTALL_DIR $OPENCV_SRC_DIR
 
