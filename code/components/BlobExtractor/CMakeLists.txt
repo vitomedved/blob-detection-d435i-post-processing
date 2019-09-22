@@ -1,5 +1,5 @@
 
-set (COMPONENT_NAME "BlobExtractor")
+set (COMPONENT_NAME "BlobExtractor.out")
 
 project(${COMPONENT_NAME})
 
@@ -30,15 +30,28 @@ set (INCLUDES   ${LOCAL_INCLUDE_DIR}
 set (SOURCES ${LOCAL_SOURCE_DIR})
 
 # Find required libraries
-find_library(OPENCV_LIB
-        NAMES opencv_core opencv_imgcodecs opencv_improc opencv_videoio opencv_highgui opencv_video
+find_library(LIB_OPENCV_CORE
+        NAMES opencv_core
         HINTS "${OPENCV_LIB_DIR}")
 
-message("OPENCV_LIB: ${OPENCV_LIB}")
+find_library(LIB_OPENCV_IMGCODECS
+        NAMES opencv_imgcodecs
+        HINTS "${OPENCV_LIB_DIR}")
 
+find_library(LIB_OPENCV_VIDEOIO
+        NAMES opencv_videoio
+        HINTS "${OPENCV_LIB_DIR}")
+
+find_library(LIB_OPENCV_HIGHGUI
+        NAMES opencv_highgui opencv_video
+        HINTS "${OPENCV_LIB_DIR}")
+
+find_library(LIB_OPENCV_VIDEO
+        NAMES opencv_video
+        HINTS "${OPENCV_LIB_DIR}")
 
 include_directories(${INCLUDES})
 
 add_executable(${COMPONENT_NAME} ${SOURCES})
 
-target_link_libraries(${COMPONENT_NAME} ${OPENCV_LIB})
+target_link_libraries(${COMPONENT_NAME} ${LIB_OPENCV_CORE} ${LIB_OPENCV_IMGCODECS} ${LIB_OPENCV_VIDEOIO} ${LIB_OPENCV_HIGHGUI} ${LIB_OPENCV_VIDEO})
