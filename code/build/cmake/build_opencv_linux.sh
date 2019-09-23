@@ -30,7 +30,8 @@ else
     rm -rf $OPENCV_INSTALL_DIR"/*";
 fi
 
-cmake -DBUILD_LIST=core,imgcodecs,improc,videoio,highgui,video -DCMAKE_INSTALL_PREFIX=$OPENCV_INSTALL_DIR $OPENCV_SRC_DIR
+# TODO: -DBUILD_LIST=core,imgcodecs,improc,videoio,highgui,video
+cmake -DWITH_FFMPEG=ON -DCMAKE_INSTALL_PREFIX=$OPENCV_INSTALL_DIR $OPENCV_SRC_DIR
 
 make -j15
 
