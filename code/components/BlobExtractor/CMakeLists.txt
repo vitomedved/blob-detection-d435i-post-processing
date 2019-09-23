@@ -14,7 +14,9 @@ endif()
 set (OPENCV_DIR ../../third-party/opencv)
 
 # Sources
-set (LOCAL_SOURCE_DIR src/BlobExtractor.cpp)
+set (LOCAL_SOURCE_DIR   src/BlobExtractor.cpp
+                        src/BackgroundSubtraction.cpp
+)
 
 # Includes
 set (LOCAL_INCLUDE_DIR include)
@@ -46,12 +48,62 @@ find_library(LIB_OPENCV_HIGHGUI
         NAMES opencv_highgui opencv_video
         HINTS "${OPENCV_LIB_DIR}")
 
-find_library(LIB_OPENCV_VIDEO
-        NAMES opencv_video
+        find_library(LIB_OPENCV_CALIB3D
+        NAMES opencv_calib3d
         HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_DNN
+        NAMES opencv_dnn
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_FEATURES2D
+        NAMES opencv_features2d
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_FLANN
+        NAMES opencv_flann
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_IMGPROC
+        NAMES opencv_imgproc
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_ML
+        NAMES opencv_ml
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_OBJDETECT
+        NAMES opencv_objdetect
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_PHOTO
+        NAMES opencv_photo
+        HINTS "${OPENCV_LIB_DIR}")
+
+        find_library(LIB_OPENCV_STITCHING
+        NAMES opencv_stitching
+        HINTS "${OPENCV_LIB_DIR}")
+
 
 include_directories(${INCLUDES})
 
 add_executable(${COMPONENT_NAME} ${SOURCES})
 
-target_link_libraries(${COMPONENT_NAME} ${LIB_OPENCV_CORE} ${LIB_OPENCV_IMGCODECS} ${LIB_OPENCV_VIDEOIO} ${LIB_OPENCV_HIGHGUI} ${LIB_OPENCV_VIDEO})
+target_link_libraries(${COMPONENT_NAME} 
+        ${LIB_OPENCV_CORE} 
+        ${LIB_OPENCV_IMGCODECS} 
+        ${LIB_OPENCV_VIDEOIO} 
+        ${LIB_OPENCV_HIGHGUI}
+        ${LIB_OPENCV_IMGPROC}
+
+        #${LIB_OPENCV_CALIB3D}
+        #${LIB_OPENCV_DNN}
+        #${LIB_OPENCV_FEATURES2D}
+        #${LIB_OPENCV_FLANN}
+        #${LIB_OPENCV_GAPI}
+        #${LIB_OPENCV_ML}
+        #${LIB_OPENCV_OBJDETECT}
+        #${LIB_OPENCV_PHOTO}
+        #${LIB_OPENCV_STITCHING}
+
+        ${LIB_OPENCV_VIDEO})
