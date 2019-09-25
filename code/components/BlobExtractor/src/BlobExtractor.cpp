@@ -71,28 +71,30 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    cv::namedWindow("Dummy video", cv::WINDOW_NORMAL);
-
     BackgroundSubtraction depthSubtractor(BackgroundSubtraction::DEPTH_THRESHOLD);
 
     cv::Ptr<cv::BackgroundSubtractorMOG2> mog2Subtractor;
     mog2Subtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
 
+    cv::Mat depthFrame;
+    cv::Mat depthOutput;
+    cv::Mat colorFrame;
+    cv::Mat colorOutput;
+
+    cv::Mat finalOutput;
+
+    uint8_t erosionDilationSize = 5;
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * erosionDilationSize + 1, 2 * erosionDilationSize + 1), cv::Point(erosionDilationSize, erosionDilationSize));
+
     bool running = true;
     while(running)
     {
-        cv::Mat depthFrame;
         bool readDepthFrame = depthVideo.read(depthFrame);
-
-        cv::Mat depthOutput;
 
         if(readDepthFrame)
         {
             cv::inRange(depthFrame, cv::Scalar(5, 5, 5), cv::Scalar(130, 130, 130), depthOutput);
             
-
-            uint8_t erosionDilationSize = 5;
-            cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * erosionDilationSize + 1, 2 * erosionDilationSize + 1), cv::Point(erosionDilationSize, erosionDilationSize));
             cv::GaussianBlur(depthOutput, depthOutput, cv::Size(5, 5), 20);
             cv::threshold(depthOutput, depthOutput, 150, 255, cv::THRESH_BINARY_INV);
             cv::bitwise_not(depthOutput, depthOutput);
@@ -108,9 +110,7 @@ int main(int argc, char* argv[])
             running = false;
         }
 
-        cv::Mat colorFrame;
         bool readColorFrame = colorVideo.read(colorFrame);
-        cv::Mat colorOutput;
 
         if(readColorFrame)
         {
@@ -118,11 +118,9 @@ int main(int argc, char* argv[])
             cv::GaussianBlur(colorOutput, colorOutput, cv::Size(5, 5), 6.0);
             cv::threshold(colorOutput, colorOutput, 100, 255, cv::THRESH_BINARY);
             
-            uint8_t erosionDilationSize = 4;
-            cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * erosionDilationSize + 1, 2 * erosionDilationSize + 1), cv::Point(erosionDilationSize, erosionDilationSize));
-            cv::dilate(depthOutput, depthOutput, kernel);
-            cv::erode(depthOutput, depthOutput, kernel);
-    
+            cv::dilate(colorOutput, colorOutput, kernel);
+            cv::erode(colorOutput, colorOutput, kernel);
+
             cv::imshow("Dummy video color frame", colorFrame);
             cv::imshow("Dummy video bg sub", colorOutput);
         }
@@ -132,12 +130,10 @@ int main(int argc, char* argv[])
             running = false;
         }
 
-        cv::Mat output;
         if(readColorFrame && readDepthFrame)
         {
-            cv::bitwise_and(colorOutput, depthOutput, output);
-
-            cv::imshow("Dummy video for final output", output);
+            cv::bitwise_and(colorOutput, depthOutput, finalOutput);
+            cv::imshow("Dummy video for final output", finalOutput);
         }
 
         cv::waitKey(100);
@@ -148,6 +144,5 @@ int main(int argc, char* argv[])
 
 void PrintHelp()
 {
-    printf("Usage: TODO\
-    \n-f is for file\n");
+    printf("Usage: TODO\n");
 }
