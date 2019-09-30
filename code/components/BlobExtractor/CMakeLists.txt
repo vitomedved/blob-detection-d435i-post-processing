@@ -96,14 +96,4 @@ target_link_libraries(${COMPONENT_NAME}
         ${LIB_OPENCV_HIGHGUI}
         ${LIB_OPENCV_IMGPROC}
 
-        #${LIB_OPENCV_CALIB3D}
-        #${LIB_OPENCV_DNN}
-        #${LIB_OPENCV_FEATURES2D}
-        #${LIB_OPENCV_FLANN}
-        #${LIB_OPENCV_GAPI}
-        #${LIB_OPENCV_ML}
-        #${LIB_OPENCV_OBJDETECT}
-        #${LIB_OPENCV_PHOTO}
-        #${LIB_OPENCV_STITCHING}
-
         ${LIB_OPENCV_VIDEO})

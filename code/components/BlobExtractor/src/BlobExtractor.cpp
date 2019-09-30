@@ -76,15 +76,23 @@ int main(int argc, char* argv[])
     cv::Ptr<cv::BackgroundSubtractorMOG2> mog2Subtractor;
     mog2Subtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
 
+    cv::Ptr<cv::BackgroundSubtractorKNN> knnSubtractor;
+    knnSubtractor = cv::createBackgroundSubtractorKNN(500, 400, false);
+
     cv::Mat depthFrame;
     cv::Mat depthOutput;
     cv::Mat colorFrame;
-    cv::Mat colorOutput;
+    cv::Mat colorOutputMog2;
+    cv::Mat colorOutputKnn;
 
     cv::Mat finalOutput;
 
-    uint8_t erosionDilationSize = 5;
-    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * erosionDilationSize + 1, 2 * erosionDilationSize + 1), cv::Point(erosionDilationSize, erosionDilationSize));
+    uint8_t smallErosionDilationSize = 5;
+    cv::Mat smallAreaKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * smallErosionDilationSize + 1, 2 * smallErosionDilationSize + 1), cv::Point(smallErosionDilationSize, smallErosionDilationSize));
+
+
+    uint8_t bigErosionDilationSize = 10;
+    cv::Mat bigAreaKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * bigErosionDilationSize + 1, 2 * bigErosionDilationSize + 1), cv::Point(bigErosionDilationSize, bigErosionDilationSize));
 
     bool running = true;
     while(running)
@@ -98,8 +106,8 @@ int main(int argc, char* argv[])
             cv::GaussianBlur(depthOutput, depthOutput, cv::Size(5, 5), 20);
             cv::threshold(depthOutput, depthOutput, 150, 255, cv::THRESH_BINARY_INV);
             cv::bitwise_not(depthOutput, depthOutput);
-            cv::dilate(depthOutput, depthOutput, kernel);
-            cv::erode(depthOutput, depthOutput, kernel);
+            cv::dilate(depthOutput, depthOutput, smallAreaKernel);
+            cv::erode(depthOutput, depthOutput, smallAreaKernel);
 
             cv::imshow("Dummy video depth", depthFrame);
             cv::imshow("Dummy video depth mask", depthOutput);
@@ -114,15 +122,25 @@ int main(int argc, char* argv[])
 
         if(readColorFrame)
         {
-            mog2Subtractor->apply(colorFrame, colorOutput);
-            cv::GaussianBlur(colorOutput, colorOutput, cv::Size(5, 5), 6.0);
-            cv::threshold(colorOutput, colorOutput, 100, 255, cv::THRESH_BINARY);
+            mog2Subtractor->apply(colorFrame, colorOutputMog2);
+            cv::GaussianBlur(colorOutputMog2, colorOutputMog2, cv::Size(5, 5), 6.0);
+            cv::threshold(colorOutputMog2, colorOutputMog2, 100, 255, cv::THRESH_BINARY);
             
-            cv::dilate(colorOutput, colorOutput, kernel);
-            cv::erode(colorOutput, colorOutput, kernel);
+            cv::dilate(colorOutputMog2, colorOutputMog2, bigAreaKernel);
+            cv::erode(colorOutputMog2, colorOutputMog2, smallAreaKernel);
+
+            knnSubtractor->apply(colorFrame, colorOutputKnn);
+            cv::GaussianBlur(colorOutputKnn, colorOutputKnn, cv::Size(5, 5), 6.0);
+            cv::threshold(colorOutputKnn, colorOutputKnn, 100, 255, cv::THRESH_BINARY);
+            
+            cv::dilate(colorOutputKnn, colorOutputKnn, bigAreaKernel);
+            cv::erode(colorOutputKnn, colorOutputKnn, smallAreaKernel);
+
+            //cv::morphologyEx(colorOutputKnn, colorOutputKnn, cv::MORPH_CLOSE, smallAreaKernel);
 
             cv::imshow("Dummy video color frame", colorFrame);
-            cv::imshow("Dummy video bg sub", colorOutput);
+            cv::imshow("Dummy video bg sub MOG2", colorOutputMog2);
+            cv::imshow("Dummy video bg sub KNN", colorOutputKnn);
         }
         else
         {
@@ -132,7 +150,12 @@ int main(int argc, char* argv[])
 
         if(readColorFrame && readDepthFrame)
         {
-            cv::bitwise_and(colorOutput, depthOutput, finalOutput);
+            cv::bitwise_and(colorOutputKnn, colorOutputMog2, colorOutputMog2);
+            cv::bitwise_or(colorOutputMog2, depthOutput, depthOutput);
+
+            finalOutput.setTo(0);
+            colorFrame.copyTo(finalOutput, depthOutput);
+
             cv::imshow("Dummy video for final output", finalOutput);
         }
 
