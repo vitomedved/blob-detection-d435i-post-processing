@@ -5,6 +5,7 @@
 
 #include "opencv2/opencv.hpp"
 #include "BackgroundSubtraction.hpp"
+#include "BlobFinder.hpp"
 
 void PrintHelp();
 
@@ -72,6 +73,8 @@ int main(int argc, char* argv[])
     }
 
     BackgroundSubtraction depthSubtractor(BackgroundSubtraction::DEPTH_THRESHOLD);
+
+    BlobFinder blobFidner;
 
     cv::Ptr<cv::BackgroundSubtractorMOG2> mog2Subtractor;
     mog2Subtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
@@ -151,12 +154,18 @@ int main(int argc, char* argv[])
         if(readColorFrame && readDepthFrame)
         {
             cv::bitwise_and(colorOutputKnn, colorOutputMog2, colorOutputMog2);
-            cv::bitwise_or(colorOutputMog2, depthOutput, depthOutput);
+            cv::bitwise_and(colorOutputMog2, depthOutput, depthOutput);
 
             finalOutput.setTo(0);
-            colorFrame.copyTo(finalOutput, depthOutput);
+            depthFrame.copyTo(finalOutput, depthOutput);
 
-            cv::imshow("Dummy video for final output", finalOutput);
+            std::vector<Blob> blobs;
+            blobFidner.FindBlob(finalOutput, blobs);
+            if(blobs.size() > 0)
+            {
+                cv::circle(finalOutput, cv::Point(blobs[0].m_center.m_x, blobs[0].m_center.m_y), 10, cv::Scalar(255, 0, 0), 5);
+                cv::imshow("Dummy video for final output", finalOutput);
+            }
         }
 
         cv::waitKey(100);

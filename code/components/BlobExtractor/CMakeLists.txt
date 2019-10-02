@@ -16,6 +16,7 @@ set (OPENCV_DIR ../../third-party/opencv)
 # Sources
 set (LOCAL_SOURCE_DIR   src/BlobExtractor.cpp
                         src/BackgroundSubtraction.cpp
+                        src/BlobFinder.cpp
 )
 
 # Includes
