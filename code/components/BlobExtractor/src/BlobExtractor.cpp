@@ -85,10 +85,12 @@ int main(int argc, char* argv[])
     cv::Mat depthFrame;
     cv::Mat depthOutput;
     cv::Mat colorFrame;
-    cv::Mat colorOutputMog2;
-    cv::Mat colorOutputKnn;
+    //cv::Mat colorOutputMog2;
+    //cv::Mat colorOutputKnn;
 
     cv::Mat finalOutput;
+
+    cv::Mat maskedColor;
 
     uint8_t smallErosionDilationSize = 5;
     cv::Mat smallAreaKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * smallErosionDilationSize + 1, 2 * smallErosionDilationSize + 1), cv::Point(smallErosionDilationSize, smallErosionDilationSize));
@@ -112,8 +114,8 @@ int main(int argc, char* argv[])
             cv::dilate(depthOutput, depthOutput, smallAreaKernel);
             cv::erode(depthOutput, depthOutput, smallAreaKernel);
 
-            cv::imshow("Dummy video depth", depthFrame);
-            cv::imshow("Dummy video depth mask", depthOutput);
+            cv::imshow("Depth frame", depthFrame);
+            cv::imshow("Depth output", depthOutput);
         }
         else
         {
@@ -123,39 +125,37 @@ int main(int argc, char* argv[])
 
         bool readColorFrame = colorVideo.read(colorFrame);
 
-        if(readColorFrame)
-        {
-            mog2Subtractor->apply(colorFrame, colorOutputMog2);
-            cv::GaussianBlur(colorOutputMog2, colorOutputMog2, cv::Size(5, 5), 6.0);
-            cv::threshold(colorOutputMog2, colorOutputMog2, 100, 255, cv::THRESH_BINARY);
+        // if(readColorFrame)
+        // {
+        //     mog2Subtractor->apply(colorFrame, colorOutputMog2);
+        //     cv::GaussianBlur(colorOutputMog2, colorOutputMog2, cv::Size(5, 5), 6.0);
+        //     cv::threshold(colorOutputMog2, colorOutputMog2, 100, 255, cv::THRESH_BINARY);
             
-            cv::dilate(colorOutputMog2, colorOutputMog2, bigAreaKernel);
-            cv::erode(colorOutputMog2, colorOutputMog2, smallAreaKernel);
+        //     cv::dilate(colorOutputMog2, colorOutputMog2, bigAreaKernel);
+        //     cv::erode(colorOutputMog2, colorOutputMog2, smallAreaKernel);
 
-            knnSubtractor->apply(colorFrame, colorOutputKnn);
-            cv::GaussianBlur(colorOutputKnn, colorOutputKnn, cv::Size(5, 5), 6.0);
-            cv::threshold(colorOutputKnn, colorOutputKnn, 100, 255, cv::THRESH_BINARY);
+        //     knnSubtractor->apply(colorFrame, colorOutputKnn);
+        //     cv::GaussianBlur(colorOutputKnn, colorOutputKnn, cv::Size(5, 5), 6.0);
+        //     cv::threshold(colorOutputKnn, colorOutputKnn, 100, 255, cv::THRESH_BINARY);
             
-            cv::dilate(colorOutputKnn, colorOutputKnn, bigAreaKernel);
-            cv::erode(colorOutputKnn, colorOutputKnn, smallAreaKernel);
+        //     cv::dilate(colorOutputKnn, colorOutputKnn, bigAreaKernel);
+        //     cv::erode(colorOutputKnn, colorOutputKnn, smallAreaKernel);
 
-            //cv::morphologyEx(colorOutputKnn, colorOutputKnn, cv::MORPH_CLOSE, smallAreaKernel);
+        //     //cv::morphologyEx(colorOutputKnn, colorOutputKnn, cv::MORPH_CLOSE, smallAreaKernel);
 
-            cv::imshow("Dummy video color frame", colorFrame);
-            cv::imshow("Dummy video bg sub MOG2", colorOutputMog2);
-            cv::imshow("Dummy video bg sub KNN", colorOutputKnn);
-        }
-        else
-        {
-            printf("[ERROR_MAIN] There was an error with reading frame.\n");
-            running = false;
-        }
+        //     cv::imshow("Dummy video color frame", colorFrame);
+        //     cv::imshow("Dummy video bg sub MOG2", colorOutputMog2);
+        //     cv::imshow("Dummy video bg sub KNN", colorOutputKnn);
+        // }
+        // else
+        // {
+        //     printf("[ERROR_MAIN] There was an error with reading frame.\n");
+        //     running = false;
+        // }
 
         if(readColorFrame && readDepthFrame)
-        {
-            cv::bitwise_and(colorOutputKnn, colorOutputMog2, colorOutputMog2);
-            cv::bitwise_and(colorOutputMog2, depthOutput, depthOutput);
-
+        //if(readDepthFrame)
+        {            
             finalOutput.setTo(0);
             depthFrame.copyTo(finalOutput, depthOutput);
 
@@ -164,11 +164,15 @@ int main(int argc, char* argv[])
             if(blobs.size() > 0)
             {
                 cv::circle(finalOutput, cv::Point(blobs[0].m_center.m_x, blobs[0].m_center.m_y), 10, cv::Scalar(255, 0, 0), 5);
-                cv::imshow("Dummy video for final output", finalOutput);
+                cv::imshow("Final output", finalOutput);
+                
+                //maskedColor.setTo(0);
+                //colorFrame.copyTo(maskedColor, depthOutput);
+                //cv::imshow("Something", maskedColor);
             }
         }
 
-        cv::waitKey(100);
+        cv::waitKey(1300);
     }
 
     return EXIT_SUCCESS;

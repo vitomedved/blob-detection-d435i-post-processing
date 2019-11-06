@@ -6,11 +6,6 @@ void BlobFinder::FindBlob(cv::Mat image, std::vector<Blob> &blobs)
 
     std::vector<DepthPoint> points;
 
-    // DepthPoint point;
-    // point.m_depth = 0;
-    // point.m_x = 0;
-    // point.m_y = 0;
-
     cv::cvtColor(image, image, cv::COLOR_RGB2GRAY);
 
     for(int y = 0; y < image.rows; y++)
@@ -31,7 +26,7 @@ void BlobFinder::FindBlob(cv::Mat image, std::vector<Blob> &blobs)
     {
         Blob retBlob;
         retBlob.m_center = points[0];
-
+        printf("Size of points for blob: %d\n", points.size());
         blobs.push_back(retBlob);
     }
 
