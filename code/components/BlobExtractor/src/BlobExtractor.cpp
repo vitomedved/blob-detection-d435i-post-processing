@@ -85,17 +85,14 @@ int main(int argc, char* argv[])
     cv::Mat depthFrame;
     cv::Mat depthOutput;
     cv::Mat colorFrame;
-    //cv::Mat colorOutputMog2;
-    //cv::Mat colorOutputKnn;
 
     cv::Mat finalOutput;
 
     cv::Mat maskedColor;
 
-    uint8_t smallErosionDilationSize = 5;
+    uint8_t smallErosionDilationSize = 8;
     cv::Mat smallAreaKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * smallErosionDilationSize + 1, 2 * smallErosionDilationSize + 1), cv::Point(smallErosionDilationSize, smallErosionDilationSize));
-
-
+    
     uint8_t bigErosionDilationSize = 10;
     cv::Mat bigAreaKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2 * bigErosionDilationSize + 1, 2 * bigErosionDilationSize + 1), cv::Point(bigErosionDilationSize, bigErosionDilationSize));
 
@@ -106,13 +103,13 @@ int main(int argc, char* argv[])
 
         if(readDepthFrame)
         {
-            cv::inRange(depthFrame, cv::Scalar(5, 5, 5), cv::Scalar(130, 130, 130), depthOutput);
+            cv::inRange(depthFrame, cv::Scalar(8, 8, 8), cv::Scalar(140, 140, 140), depthOutput);
             
             cv::GaussianBlur(depthOutput, depthOutput, cv::Size(5, 5), 20);
             cv::threshold(depthOutput, depthOutput, 150, 255, cv::THRESH_BINARY_INV);
             cv::bitwise_not(depthOutput, depthOutput);
-            cv::dilate(depthOutput, depthOutput, smallAreaKernel);
-            cv::erode(depthOutput, depthOutput, smallAreaKernel);
+            cv::erode(depthOutput, depthOutput, bigAreaKernel);
+            cv::dilate(depthOutput, depthOutput, bigAreaKernel);
 
             cv::imshow("Depth frame", depthFrame);
             cv::imshow("Depth output", depthOutput);
@@ -124,37 +121,8 @@ int main(int argc, char* argv[])
         }
 
         bool readColorFrame = colorVideo.read(colorFrame);
- 
-        // if(readColorFrame)
-        // {
-        //     mog2Subtractor->apply(colorFrame, colorOutputMog2);
-        //     cv::GaussianBlur(colorOutputMog2, colorOutputMog2, cv::Size(5, 5), 6.0);
-        //     cv::threshold(colorOutputMog2, colorOutputMog2, 100, 255, cv::THRESH_BINARY);
-            
-        //     cv::dilate(colorOutputMog2, colorOutputMog2, bigAreaKernel);
-        //     cv::erode(colorOutputMog2, colorOutputMog2, smallAreaKernel);
-
-        //     knnSubtractor->apply(colorFrame, colorOutputKnn);
-        //     cv::GaussianBlur(colorOutputKnn, colorOutputKnn, cv::Size(5, 5), 6.0);
-        //     cv::threshold(colorOutputKnn, colorOutputKnn, 100, 255, cv::THRESH_BINARY);
-            
-        //     cv::dilate(colorOutputKnn, colorOutputKnn, bigAreaKernel);
-        //     cv::erode(colorOutputKnn, colorOutputKnn, smallAreaKernel);
-
-        //     //cv::morphologyEx(colorOutputKnn, colorOutputKnn, cv::MORPH_CLOSE, smallAreaKernel);
-
-        //     cv::imshow("Dummy video color frame", colorFrame);
-        //     cv::imshow("Dummy video bg sub MOG2", colorOutputMog2);
-        //     cv::imshow("Dummy video bg sub KNN", colorOutputKnn);
-        // }
-        // else
-        // {
-        //     printf("[ERROR_MAIN] There was an error with reading frame.\n");
-        //     running = false;
-        // }
 
         if(readColorFrame && readDepthFrame)
-        //if(readDepthFrame)
         {            
             finalOutput.setTo(0);
             depthFrame.copyTo(finalOutput, depthOutput);
@@ -166,13 +134,13 @@ int main(int argc, char* argv[])
                 cv::circle(finalOutput, cv::Point(blobs[0].m_center.m_x, blobs[0].m_center.m_y), 10, cv::Scalar(255, 0, 0), 5);
                 cv::imshow("Final output", finalOutput);
                 
-                //maskedColor.setTo(0);
-                //colorFrame.copyTo(maskedColor, depthOutput);
-                //cv::imshow("Something", maskedColor);
+                maskedColor.setTo(0);
+                colorFrame.copyTo(maskedColor, depthOutput);
+                cv::imshow("Something", maskedColor);
             }
         }
 
-        cv::waitKey(1300);
+        cv::waitKey(1200);
     }
 
     return EXIT_SUCCESS;
