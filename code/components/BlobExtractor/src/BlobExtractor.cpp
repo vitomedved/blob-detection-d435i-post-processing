@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
         }
 
         bool readColorFrame = colorVideo.read(colorFrame);
-
+ 
         // if(readColorFrame)
         // {
         //     mog2Subtractor->apply(colorFrame, colorOutputMog2);
