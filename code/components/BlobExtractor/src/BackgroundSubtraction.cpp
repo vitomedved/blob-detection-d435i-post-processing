@@ -21,10 +21,10 @@ BackgroundSubtraction::BackgroundSubtraction(BackgroundSubtraction::SubtractorTy
 		m_threshold = 3;
 		break;
 	case MOG2:
-		m_bgSubtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
+		//m_bgSubtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
 		break;
 	case KNN:
-		m_bgSubtractor = cv::createBackgroundSubtractorKNN(500, 400.0, false);
+		//m_bgSubtractor = cv::createBackgroundSubtractorKNN(500, 400.0, false);
 		break;
 	}
 }
@@ -41,10 +41,10 @@ BackgroundSubtraction::BackgroundSubtraction(BackgroundSubtraction::SubtractorTy
 		m_threshold = 3;
 		break;
 	case MOG2:
-		m_bgSubtractor = cv::createBackgroundSubtractorMOG2(history, varThreshold, shadows);
+		//m_bgSubtractor = cv::createBackgroundSubtractorMOG2(history, varThreshold, shadows);
 		break;
 	case KNN:
-		m_bgSubtractor = cv::createBackgroundSubtractorKNN(history, varThreshold, shadows);
+		//m_bgSubtractor = cv::createBackgroundSubtractorKNN(history, varThreshold, shadows);
 		break;
 	}
 }
@@ -56,7 +56,7 @@ void BackgroundSubtraction::Apply(cv::Mat& src, cv::Mat& dst)
 		Subtract(src, dst);
 	}
 	else
-	{
+	{/*
 		cv::Mat fgFrame;
 		m_bgSubtractor->apply(src, fgFrame, 0.25);
 
@@ -69,7 +69,7 @@ void BackgroundSubtraction::Apply(cv::Mat& src, cv::Mat& dst)
 
 		fgFrame.convertTo(fgFrame, CV_8U);
 
-		fgFrame.copyTo(dst);
+		fgFrame.copyTo(dst);*/
 	}
 }
 

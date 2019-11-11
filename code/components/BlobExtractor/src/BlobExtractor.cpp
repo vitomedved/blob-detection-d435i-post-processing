@@ -76,11 +76,11 @@ int main(int argc, char* argv[])
 
     BlobFinder blobFidner;
 
-    cv::Ptr<cv::BackgroundSubtractorMOG2> mog2Subtractor;
-    mog2Subtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
+    //cv::Ptr<cv::BackgroundSubtractorMOG2> mog2Subtractor;
+    //mog2Subtractor = cv::createBackgroundSubtractorMOG2(500, 16.0, false);
 
-    cv::Ptr<cv::BackgroundSubtractorKNN> knnSubtractor;
-    knnSubtractor = cv::createBackgroundSubtractorKNN(500, 400, false);
+    //cv::Ptr<cv::BackgroundSubtractorKNN> knnSubtractor;
+    //knnSubtractor = cv::createBackgroundSubtractorKNN(500, 400, false);
 
     cv::Mat depthFrame;
     cv::Mat depthOutput;
@@ -131,7 +131,10 @@ int main(int argc, char* argv[])
             blobFidner.FindBlob(finalOutput, blobs);
             if(blobs.size() > 0)
             {
-                cv::circle(finalOutput, cv::Point(blobs[0].m_center.m_x, blobs[0].m_center.m_y), 10, cv::Scalar(255, 0, 0), 5);
+                for(int i = 0; i < blobs.size(); i++)
+                {
+                    cv::circle(finalOutput, cv::Point(blobs[i].m_center.x, blobs[i].m_center.y), 3, cv::Scalar(4*i, 0, 0), 2);
+                }
                 cv::imshow("Final output", finalOutput);
                 
                 maskedColor.setTo(0);

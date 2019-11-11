@@ -32,7 +32,7 @@ private:
 
 	SubtractorType m_type;
 
-	cv::Ptr<cv::BackgroundSubtractor> m_bgSubtractor;
+	//cv::Ptr<cv::BackgroundSubtractor> m_bgSubtractor;
 	cv::Mat m_background;
 };
 
