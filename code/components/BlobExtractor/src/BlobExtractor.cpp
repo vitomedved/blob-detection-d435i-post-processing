@@ -151,5 +151,5 @@ int main(int argc, char* argv[])
 
 void PrintHelp()
 {
-    printf("Usage: TODO\n");
+    printf("To use this post-processing tool use -c \"path/to/color/recording\" -d \"path/to/depth/recording\".\n");
 }
